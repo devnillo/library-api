@@ -16,7 +16,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 class AuthController extends Controller
 {
     #[Post('register')]
-    public function register(RegisterUserRequest $request)
+    public function register(RegisterUserRequest $request, )
     {
         $credentials = $request->validated();
 
@@ -62,5 +62,5 @@ class AuthController extends Controller
                 'data' => AuthUserResource::make($user)
             ], 200);
     }
-    
+
 }
