@@ -2,9 +2,9 @@
 
 namespace App\Http\Responses;
 
-class JsonResponse
+class JsonApiResponse
 {
-    public static function success(?array $data, string $message, ?int $status): \Illuminate\Http\JsonResponse
+    public static function success(string $data, string $message, ?int $status = 200): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'error' => false,
@@ -14,12 +14,11 @@ class JsonResponse
     }
 
 
-    public static function error(?array $data, string $message, int $status): \Illuminate\Http\JsonResponse
+    public static function error( string $message, int $status): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'error' => true,
             'message' => $message,
-            'data' => $data
         ],$status);
     }
 }

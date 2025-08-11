@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\AuthLoginAction;
+use App\Actions\Auth\AuthRegisterAction;
+use App\DTOs\Auth\AuthLoginDTO;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Resources\AuthUserResource;
+use App\Http\Responses\JsonApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,55 +16,37 @@ use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
 
-#[Prefix('auth')]
+#[Prefix("auth")]
 class AuthController extends Controller
 {
     #[Post('register')]
-    public function register(RegisterUserRequest $request, )
+    public function register(RegisterUserRequest $request)
     {
         $credentials = $request->validated();
+        $token = $action->handle($credentials);
+        return JsonApiResponse::success($token, "Usuario logado com sucesso");
 
-        $user = User::create($credentials);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json([
-            'error' => false,
-            'message' => 'Usuario Registrado com sucesso',
-            'data' => $token
-        ]);
     }
-    #[Post('login')]
-    public function login(LoginUserRequest $request)
+
+    #[Post("login")]
+    public function login(LoginUserRequest $request, AuthLoginAction $action)
     {
         $credentials = $request->validated();
-
-        if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'error' => true,
-                'message' => 'Credentiais invalidas',
-                'data' => ""
-            ], 400);
+        $token = $action->handle(AuthLoginDTO::fromArray($credentials));
+        if (!$token) {
+            return JsonApiResponse::error("Credenciais invalidas", 401);
         }
-
-        $user = Auth::user();
-        $user->tokens()->delete();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'error' => false,
-            'message' => 'Usuario Registrado com sucesso',
-            'data' => $token
-        ]);
+        return JsonApiResponse::success($token, "Login realizado com sucesso");
     }
-    #[Get('user', middleware:'auth:sanctum')]
+
+    #[Get("user", middleware: "auth:sanctum")]
     public function getUser(Request $request)
     {
         $user = Auth::user();
-        return response()->json([
-                'error' => false,
-                'message' => 'sucesso',
-                'data' => AuthUserResource::make($user)
-            ], 200);
+        return JsonApiResponse::success(
+            AuthUserResource::make($user),
+            "Usuário autenticado com sucesso",
+        );
     }
-
+    
 }
