@@ -33,7 +33,7 @@ class AuthController extends Controller
     #[Post("login")]
     public function login(LoginUserRequest $request, AuthLoginAction $action)
     {
-        $credentials = $request->all();
+        $credentials = $request->validated();
         $token = $action->handle(AuthLoginDTO::fromArray($credentials));
         if (!$token) {
             return JsonApiResponse::error("Credenciais invalidas", 401);
