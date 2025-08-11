@@ -1,0 +1,27 @@
+meta {
+  name: User
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{url}}/auth/user
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: 6|sP2IywNQmeM3Q3SIeJUhykDFffFPbWRNDz9I1pxW51ef94d9
+}
+
+body:json {
+  {
+    "name": "gabriel",
+    "email": "gabriel@wgmail.com",
+    "password": "gabriel"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
